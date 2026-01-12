@@ -2,9 +2,5 @@
 fastapi
 uvicorn
 httpx
-chromadb
 python-dotenv
 python-multipart
-
-# Voice dependencies
-faster-whisper

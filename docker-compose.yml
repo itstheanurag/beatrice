@@ -1,0 +1,60 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: beatrice-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    restart: unless-stopped
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: beatrice-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/chroma:/chroma/data
+    environment:
+      - IS_PERSISTENT=TRUE
+    restart: unless-stopped
+
+  # Placeholder for TTS (Piper)
+  # We might implement a custom python wrapper for better control
+  tts:
+    image: python:3.11-slim
+    container_name: beatrice-tts
+    volumes:
+      - ./src/voice:/app/src
+      - ./data/tts:/app/data
+    working_dir: /app
+    command: tail -f /dev/null # Placeholder until implementation
+    restart: unless-stopped
+
+  # Placeholder for STT (Faster-Whisper)
+  stt:
+    image: python:3.11-slim
+    container_name: beatrice-stt
+    volumes:
+      - ./src/voice:/app/src
+      - ./data/stt:/app/data
+    working_dir: /app
+    command: tail -f /dev/null # Placeholder until implementation
+    restart: unless-stopped
+
+  # Main Orchestrator
+  core:
+    image: python:3.11-slim
+    container_name: beatrice-core
+    volumes:
+      - ./src:/app/src
+      - .:/app
+    working_dir: /app
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - CHROMA_HOST=http://chromadb:8000
+    command: tail -f /dev/null # Placeholder until implementation
+    depends_on:
+      - ollama
+      - chromadb
+    restart: unless-stopped

@@ -40,3 +40,37 @@ class ToolRegistry:
         if name in self.tools:
             return self.tools[name](**kwargs)
         return f"Tool {name} not found."
+
+    def get_ollama_tools(self) -> list:
+        """Returns tools in Ollama's expected format for tool calling."""
+        return [
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_time",
+                    "description": "Get the current date and time",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "list_files",
+                    "description": "List files in a directory",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "The directory path to list files from"
+                            }
+                        },
+                        "required": ["path"]
+                    }
+                }
+            }
+        ]

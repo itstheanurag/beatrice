@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    fastapi \
+    uvicorn \
+    httpx \
+    chromadb \
+    python-dotenv
+
+WORKDIR /app
+COPY . .
+
+# Default command
+CMD ["python", "src/brain/orchestrator.py"]

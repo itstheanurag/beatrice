@@ -19,41 +19,42 @@ services:
       - IS_PERSISTENT=TRUE
     restart: unless-stopped
 
-  # Placeholder for TTS (Piper)
-  # We might implement a custom python wrapper for better control
   tts:
-    image: python:3.11-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.voice
     container_name: beatrice-tts
     volumes:
-      - ./src/voice:/app/src
+      - .:/app
       - ./data/tts:/app/data
-    working_dir: /app
-    command: tail -f /dev/null # Placeholder until implementation
+    environment:
+      - PIPER_MODEL=/app/data/models/en_US-lessac-medium.onnx
+    command: python src/voice/tts_service.py
     restart: unless-stopped
 
-  # Placeholder for STT (Faster-Whisper)
   stt:
-    image: python:3.11-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.voice
     container_name: beatrice-stt
     volumes:
-      - ./src/voice:/app/src
+      - .:/app
       - ./data/stt:/app/data
-    working_dir: /app
-    command: tail -f /dev/null # Placeholder until implementation
+    command: python src/voice/stt_service.py
     restart: unless-stopped
 
   # Main Orchestrator
   core:
-    image: python:3.11-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.core
     container_name: beatrice-core
     volumes:
-      - ./src:/app/src
       - .:/app
-    working_dir: /app
     environment:
-      - OLLAMA_HOST=http://ollama:11434
-      - CHROMA_HOST=http://chromadb:8000
-    command: tail -f /dev/null # Placeholder until implementation
+      - OLLAMA_HOST=http://beatrice-ollama:11434
+      - CHROMA_HOST=http://beatrice-chroma:8000
+    command: tail -f /dev/null # Keep alive for interaction
     depends_on:
       - ollama
       - chromadb
